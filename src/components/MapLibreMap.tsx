@@ -4,7 +4,7 @@ import {
   type RequestTransformFunction,
 } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { RMap, useMap } from 'maplibre-react-components';
+import { RMap, RPopup, useMap } from 'maplibre-react-components';
 import { getHoydeFromPunkt } from '../api/getHoydeFromPunkt';
 import { useEffect, useState } from 'react';
 import { Overlay } from './Overlay';
@@ -59,6 +59,11 @@ export const MapLibreMap = () => {
         <h2>Dette er et overlay</h2>
         <p>Legg til funksjonalitet knyttet til kartet.</p>
       </Overlay>
+      {clickPoint && (
+        <RPopup longitude={clickPoint.lng} latitude={clickPoint.lat}>
+          <p>Height: {pointHoyde ?? 'Loading...'} moh.</p>
+        </RPopup>
+      )}
       <DrawComponent />
     </RMap>
   );
