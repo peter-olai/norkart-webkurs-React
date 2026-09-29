@@ -5,6 +5,7 @@ import {
 } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { RLayer, RMap, RPopup, RSource, useMap } from 'maplibre-react-components';
+import { Card, CardContent, Typography } from '@mui/material';
 import { getHoydeFromPunkt } from '../api/getHoydeFromPunkt';
 import { useEffect, useState } from 'react';
 import { Overlay } from './Overlay';
@@ -40,6 +41,19 @@ const lineStyle = {
   'line-width': 3,
 };
 
+type Building = {
+  Bygningsnummer?: number;
+  FkbData?: {
+    BygningsOmriss?: string;
+    Medium?: string;
+  };
+  MatrikkelData?: {
+    Bygningstype?: string;
+    Bygningstatus?: string;
+    Naringsgruppe?: string;
+  };
+};
+
 export const MapLibreMap = () => {
   const [pointHoyde, setPointHoydeAtPunkt] = useState<number | undefined>(
     undefined
@@ -47,6 +61,9 @@ export const MapLibreMap = () => {
   const [clickPoint, setClickPoint] = useState<LngLat | undefined>(undefined);
 
   const [address, setAddress] = useState<Address | null>(null);
+  const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(
+    null
+  );
 
   const [bygningsOmriss, setBygningsOmriss] = useState<GeoJSON | undefined>(
     undefined
@@ -73,10 +90,12 @@ export const MapLibreMap = () => {
           bygningResponse.FkbData.BygningsOmriss
         );
         setBygningsOmriss(geoJsonObject);
+        setSelectedBuilding(bygningResponse as Building);
         return;
       }
 
       setBygningsOmriss(undefined);
+      setSelectedBuilding(null);
     };
 
     void fetchBuildingOutline();
@@ -88,8 +107,10 @@ export const MapLibreMap = () => {
     if (bygningResponse?.FkbData?.BygningsOmriss) {
       const geoJsonObject = JSON.parse(bygningResponse.FkbData.BygningsOmriss);
       setBygningsOmriss(geoJsonObject);
+      setSelectedBuilding(bygningResponse as Building);
     } else {
       setBygningsOmriss(undefined);
+      setSelectedBuilding(null);
     }
 
     setPointHoydeAtPunkt(hoyder[0].Z);
@@ -111,6 +132,38 @@ export const MapLibreMap = () => {
       <Overlay>
         <SearchBar setAddress={setAddress} />
       </Overlay>
+      {selectedBuilding && (
+        <Overlay
+          style={{
+            position: 'absolute',
+            right: '20px',
+            bottom: '20px',
+            zIndex: 2,
+            maxWidth: '320px',
+          }}
+        >
+          <Card sx={{ width: '100%' }}>
+            <CardContent>
+              <Typography variant="h6">
+                Bygning
+              </Typography>
+              <Typography variant="body2">
+                Bygningsnummer: {selectedBuilding.Bygningsnummer ?? '-'}
+              </Typography>
+              <Typography variant="body2">
+                Type: {selectedBuilding.MatrikkelData?.Bygningstype ?? '-'}
+              </Typography>
+              <Typography variant="body2">
+                Status: {selectedBuilding.MatrikkelData?.Bygningstatus ?? '-'}
+              </Typography>
+              <Typography variant="body2">
+                Næringsgruppe:{' '}
+                {selectedBuilding.MatrikkelData?.Naringsgruppe ?? '-'}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Overlay>
+      )}
       {bygningsOmriss && (
         <>
           <RSource id="bygning" type="geojson" data={bygningsOmriss} />
