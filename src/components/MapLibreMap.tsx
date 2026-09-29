@@ -4,7 +4,13 @@ import {
   type RequestTransformFunction,
 } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { RLayer, RMap, RPopup, RSource, useMap } from 'maplibre-react-components';
+import {
+  RLayer,
+  RMap,
+  RPopup,
+  RSource,
+  useMap,
+} from 'maplibre-react-components';
 import { Card, CardContent, Typography } from '@mui/material';
 import { getHoydeFromPunkt } from '../api/getHoydeFromPunkt';
 import { useEffect, useState } from 'react';
@@ -140,27 +146,24 @@ export const MapLibreMap = () => {
             bottom: '20px',
             zIndex: 2,
             maxWidth: '320px',
+            boxShadow: 'none',
           }}
         >
-          <Card sx={{ width: '100%' }}>
-            <CardContent>
-              <Typography variant="h6">
-                Bygning
-              </Typography>
-              <Typography variant="body2">
-                Bygningsnummer: {selectedBuilding.Bygningsnummer ?? '-'}
-              </Typography>
-              <Typography variant="body2">
-                Type: {selectedBuilding.MatrikkelData?.Bygningstype ?? '-'}
-              </Typography>
-              <Typography variant="body2">
-                Status: {selectedBuilding.MatrikkelData?.Bygningstatus ?? '-'}
-              </Typography>
-              <Typography variant="body2">
-                Næringsgruppe:{' '}
-                {selectedBuilding.MatrikkelData?.Naringsgruppe ?? '-'}
-              </Typography>
-            </CardContent>
+          <Card sx={{ width: '100%', boxShadow: 'none' , color: 'hsl(320, 100%, 50%)'}}>
+            <Typography variant="h6">Bygning</Typography>
+            <Typography variant="body2">
+              Bygningsnummer: {selectedBuilding.Bygningsnummer ?? '-'}
+            </Typography>
+            <Typography variant="body2">
+              Type: {selectedBuilding.MatrikkelData?.Bygningstype ?? '-'}
+            </Typography>
+            <Typography variant="body2">
+              Status: {selectedBuilding.MatrikkelData?.Bygningstatus ?? '-'}
+            </Typography>
+            <Typography variant="body2">
+              Næringsgruppe:{' '}
+              {selectedBuilding.MatrikkelData?.Naringsgruppe ?? '-'}
+            </Typography>
           </Card>
         </Overlay>
       )}
@@ -192,7 +195,8 @@ export const MapLibreMap = () => {
           <div>
             <strong>Map point</strong>
             <div>
-              Elevation: {pointHoyde !== undefined ? `${pointHoyde} moh.` : 'Loading...'}
+              Elevation:{' '}
+              {pointHoyde !== undefined ? `${pointHoyde} moh.` : 'Loading...'}
             </div>
           </div>
         </RPopup>
