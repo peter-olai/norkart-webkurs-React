@@ -9,6 +9,8 @@ import { getHoydeFromPunkt } from '../api/getHoydeFromPunkt';
 import { useEffect, useState } from 'react';
 import { Overlay } from './Overlay';
 import DrawComponent from './DrawComponent';
+import { SearchBar, type Address } from './SearchBar';
+
 
 const TRONDHEIM_COORDS: [number, number] = [10.40565401, 63.4156575];
 
@@ -23,7 +25,7 @@ type NorkartBasemapVariant =
   | 'transparent'
   | 'hybrid'
   | 'ortofoto';
-const NORKART_BASEMAP_VARIANT: NorkartBasemapVariant = 'standard';
+const NORKART_BASEMAP_VARIANT: NorkartBasemapVariant = 'darkmode';
 
 const NORKART_BASEMAP_STYLE = `${KVP_BASE_URL}norkart-basemap/${NORKART_BASEMAP_VARIANT}/style.json`;
 
@@ -32,6 +34,8 @@ export const MapLibreMap = () => {
     undefined
   );
   const [clickPoint, setClickPoint] = useState<LngLat | undefined>(undefined);
+
+  const [address, setAddress] = useState<Address | null>(null);
 
   useEffect(() => {
     console.log(pointHoyde, clickPoint);
@@ -56,9 +60,14 @@ export const MapLibreMap = () => {
       onClick={onMapClick}
     >
       <Overlay>
-        <h2>Dette er et overlay</h2>
-        <p>Legg til funksjonalitet knyttet til kartet.</p>
+        <SearchBar setAddress={setAddress} />
       </Overlay>
+      {address ? (
+        <MapFlyTo
+          lng={address.PayLoad.Posisjon.X}
+          lat={address.PayLoad.Posisjon.Y}
+        />
+      ) : null}
       <DrawComponent />
     </RMap>
   );
@@ -68,7 +77,7 @@ function MapFlyTo({ lng, lat }: { lng: number; lat: number }) {
   const map = useMap();
 
   useEffect(() => {
-    map.flyTo({ center: [lng, lat], zoom: 20, speed: 10 });
+    map.flyTo({ center: [lng, lat], zoom: 18, speed: 10 });
   }, [lng, lat, map]);
 
   return null;
@@ -82,4 +91,4 @@ const transformRequest: RequestTransformFunction = (url) => {
   const apiKey = import.meta.env.VITE_API_KEY;
   const separator = url.includes('?') ? '&' : '?';
   return { url: `${url}${separator}api_key=${encodeURIComponent(apiKey)}` };
-};
+}
